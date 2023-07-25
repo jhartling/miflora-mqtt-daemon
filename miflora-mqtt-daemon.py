@@ -82,6 +82,11 @@ def on_connect(client, userdata, flags, rc):
         #kill main thread
         os._exit(1)
 
+def on_disconnect(client, userdata, rc):
+    if rc != 0:
+        print_line('Unexpected disconnection.', error=True)
+        #kill main thread
+        os._exit(1)
 
 def on_publish(client, userdata, mid):
     #print_line('Data successfully published.')
@@ -136,6 +141,7 @@ if reporting_mode in ['mqtt-json', 'mqtt-smarthome', 'homeassistant-mqtt', 'thin
     print_line('Connecting to MQTT broker ...')
     mqtt_client = mqtt.Client()
     mqtt_client.on_connect = on_connect
+    mqtt_client.on_disconnect = on_disconnect
     mqtt_client.on_publish = on_publish
     if reporting_mode == 'mqtt-json':
         mqtt_client.will_set('{}/$announce'.format(base_topic), payload='{}', retain=True)
